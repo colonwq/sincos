@@ -16,41 +16,42 @@ def calculated_cos(angle_deg: float) -> float:
 
 
 # Use monotonic() for CircuitPython (no perf_counter); works on CPython too
-def time_lookups(n: int, angles_deg: list) -> float:
+# Angles computed in-loop from range to avoid allocating a large list (OOM).
+def time_lookups(n: int, angle_min: float, angle_max: float) -> float:
+    step = (angle_max - angle_min) / n if n else 0
     start = time.monotonic()
-    for a in angles_deg:
+    for i in range(n):
+        a = angle_min + i * step
         SinCos.lookup_sin(a)
         SinCos.lookup_cos(a)
     return time.monotonic() - start
 
 
-def time_calculations(n: int, angles_deg: list) -> float:
+def time_calculations(n: int, angle_min: float, angle_max: float) -> float:
+    step = (angle_max - angle_min) / n if n else 0
     start = time.monotonic()
-    for a in angles_deg:
+    for i in range(n):
+        a = angle_min + i * step
         calculated_sin(a)
         calculated_cos(a)
     return time.monotonic() - start
 
 
 def main():
-    # Reuse a list of angles so we measure pure lookup/calc cost
-    # Mix of angles in 0-360 to exercise all quadrants
-    base_angles = [i * 1.7 for i in range(212)]  # 0, 1.7, 3.4, ... (covers 0-360)
+    # Angle range 0-360 to exercise all quadrants; no list allocation
+    angle_min = 0.0
+    angle_max = 360.0
 
     for n in [10_000, 100_000]:
-        # Repeat base_angles to get exactly n sin+cos evaluations (n pairs)
-        pairs_needed = n
-        angles_deg = (base_angles * ((pairs_needed // len(base_angles)) + 1))[:pairs_needed]
+        lookup_time = time_lookups(n, angle_min, angle_max)
+        calc_time = time_calculations(n, angle_min, angle_max)
 
-        lookup_time = time_lookups(n, angles_deg)
-        calc_time = time_calculations(n, angles_deg)
-
-        print(f"--- {n:,} lookups / calculations ---")
-        print(f"  Lookup (SinCos):     {lookup_time:.4f} s  ({n / lookup_time:,.0f} pairs/s)")
-        print(f"  Calculation (math):  {calc_time:.4f} s  ({n / calc_time:,.0f} pairs/s)")
+        print("--- %d lookups / calculations ---" % n)
+        print("  Lookup (SinCos):     %.4f s  (%.0f pairs/s)" % (lookup_time, n / lookup_time))
+        print("  Calculation (math):  %.4f s  (%.0f pairs/s)" % (calc_time, n / calc_time))
         if calc_time > 0:
             ratio = lookup_time / calc_time
-            print(f"  Lookup vs calc:      {ratio:.2f}x")
+            print("  Lookup vs calc:      %.2fx" % ratio)
         print()
 
     print("Done.")
