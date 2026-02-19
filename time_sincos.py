@@ -15,20 +15,21 @@ def calculated_cos(angle_deg: float) -> float:
     return math.cos(math.radians(angle_deg))
 
 
-def time_lookups(n: int, angles_deg: list[float]) -> float:
-    start = time.perf_counter()
+# Use monotonic() for CircuitPython (no perf_counter); works on CPython too
+def time_lookups(n: int, angles_deg: list) -> float:
+    start = time.monotonic()
     for a in angles_deg:
         SinCos.lookup_sin(a)
         SinCos.lookup_cos(a)
-    return time.perf_counter() - start
+    return time.monotonic() - start
 
 
-def time_calculations(n: int, angles_deg: list[float]) -> float:
-    start = time.perf_counter()
+def time_calculations(n: int, angles_deg: list) -> float:
+    start = time.monotonic()
     for a in angles_deg:
         calculated_sin(a)
         calculated_cos(a)
-    return time.perf_counter() - start
+    return time.monotonic() - start
 
 
 def main():
