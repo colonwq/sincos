@@ -3,8 +3,20 @@ Timing script: measure 10,000 and 100,000 lookups vs math.sin/cos calculations.
 """
 
 import math
+import os
+import sys
 import time
 from sincos import SinCos
+
+try:
+    import board
+
+    BOARD_ID = getattr(board, "board_id", "unknown")
+except ImportError:
+    BOARD_ID = None
+
+_uname = getattr(os, "uname", None)
+BOARD_NAME = " ".join(_uname()) if callable(_uname) else "%s %s" % (os.name, sys.platform)
 
 
 def calculated_sin(angle_deg: float) -> float:
@@ -38,6 +50,10 @@ def time_calculations(n: int, angle_min: float, angle_max: float) -> float:
 
 
 def main():
+    print("Board name: %s" % BOARD_NAME)
+    print("Board id:   %s" % (BOARD_ID if BOARD_ID else "(n/a)"))
+    print()
+
     # Angle range 0-360 to exercise all quadrants; no list allocation
     angle_min = 0.0
     angle_max = 360.0

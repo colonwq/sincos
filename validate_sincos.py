@@ -17,7 +17,9 @@ def calculated_cos(angle_deg: float) -> float:
 def main():
     print("SinCos validation: lookup vs calculated (math.sin/cos)")
     print("=" * 80)
-    print(f"{'Angle (°)':<10} {'lookup_sin':<14} {'calc_sin':<14} {'sin_diff':<12} {'lookup_cos':<14} {'calc_cos':<14} {'cos_diff':<12}")
+    print(
+        f"{'Angle (°)':<10} {'lookup_sin':<14} {'calc_sin':<14} {'sin_diff':<12} {'lookup_cos':<14} {'calc_cos':<14} {'cos_diff':<12}"
+    )
     print("-" * 80)
 
     max_sin_diff = 0.0
@@ -36,7 +38,9 @@ def main():
         cos_diff = abs(lc - cc)
         max_sin_diff = max(max_sin_diff, sin_diff)
         max_cos_diff = max(max_cos_diff, cos_diff)
-        print(f"{angle:<10.2f} {ls:<14.6f} {cs:<14.6f} {sin_diff:<12.2e} {lc:<14.6f} {cc:<14.6f} {cos_diff:<12.2e}")
+        print(
+            f"{angle:<10.2f} {ls:<14.6f} {cs:<14.6f} {sin_diff:<12.2e} {lc:<14.6f} {cc:<14.6f} {cos_diff:<12.2e}"
+        )
 
     print("-" * 80)
     print(f"Max |lookup_sin - calc_sin|: {max_sin_diff:.2e}")
